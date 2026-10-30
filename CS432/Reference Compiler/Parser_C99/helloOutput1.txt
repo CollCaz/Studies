@@ -1,0 +1,55 @@
+
+--- Abstract Syntax Tree ---
+Program
+  Program
+    FunctionDefinition
+      TypeSpecifier (void)
+      FunctionDeclarator
+        Identifier (printf)
+        ParameterList
+          ParameterDeclaration
+            DeclarationSpecifiers
+              TypeQualifier (const)
+              TypeSpecifier (char)
+            PointerDeclarator
+              Pointer (*)
+              Identifier (str)
+      CompoundStatement ({})
+    FunctionDefinition
+      TypeSpecifier (int)
+      FunctionDeclarator
+        Identifier (sum)
+        ParameterList
+          ParameterList
+            ParameterDeclaration
+              TypeSpecifier (int)
+              Identifier (a)
+          ParameterDeclaration
+            TypeSpecifier (int)
+            Identifier (b)
+      CompoundStatement
+        BlockItemList
+          Return
+            BinaryOp (+)
+              Identifier (a)
+              Identifier (b)
+  FunctionDefinition
+    TypeSpecifier (int)
+    FunctionDeclarator
+      Identifier (main)
+      ParameterList
+        ParameterDeclaration
+          TypeSpecifier (void)
+    CompoundStatement
+      Return
+        IntConstant (0)
+----------------------------
+
+--- Symbol Table Contents ---
+  Name: main           , Kind: FUNCTION, Type: Function returning int
+  Name: z              , Kind: VARIABLE, Type: char
+  Name: y              , Kind: VARIABLE, Type: double
+  Name: x              , Kind: VARIABLE, Type: int
+  Name: sum            , Kind: FUNCTION, Type: Function returning int
+  Name: printf         , Kind: FUNCTION, Type: Function returning void
+-----------------------------

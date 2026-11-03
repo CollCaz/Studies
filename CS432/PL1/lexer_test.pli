@@ -1,0 +1,210 @@
+/* ================================================================
+   lexer_test.pli
+   PL/I test file for exercising a lexical analyzer.
+   Covers: comments, keywords, identifiers, numeric literals,
+   string literals, bit/hex strings, operators, delimiters,
+   labels, preprocessor statements, and spacing edge cases.
+   ================================================================ */
+
+%PAGE;
+%DECLARE DEBUG FIXED;
+%DEBUG = 1;
+
+TESTPROG: PROCEDURE OPTIONS(MAIN);
+
+   /* ---------- Declarations: keywords and identifiers ---------- */
+   DECLARE (I, J, K)        FIXED BINARY(31) INITIAL(0);
+   DECLARE COUNTER_1        FIXED DECIMAL(7,2);
+   DECLARE TOTAL#           FLOAT DECIMAL(15);
+   DECLARE $AMOUNT          FLOAT BINARY(53);
+   DECLARE @FLAG            BIT(1) INITIAL('1'B);
+   DCL     NAME             CHARACTER(30) VARYING;
+   DCL     MSG              CHAR(80);
+   DCL     BITS             BIT(8) INIT('10101010'B);
+   DCL     HEXVAL           CHAR(4) INIT('DEADBEEF'X);
+   DCL     Z                COMPLEX FLOAT DECIMAL(6);
+   DCL     TABLE(10, 20)    FIXED BIN(15);
+   DCL     P                POINTER;
+   DCL     1 REC,
+             2 ID           FIXED BIN(31),
+             2 LABEL_TXT    CHAR(16),
+             2 VALUE        FLOAT DEC(9);
+   DCL     LONG_IDENTIFIER_WITH_UNDERSCORES_123 FIXED BIN;
+   DCL     A1B2C3           FIXED;
+
+   /* ---------- Numeric literals ---------- */
+   I = 0;
+   I = 42;
+   I = 007;
+   COUNTER_1 = 123.45;
+   COUNTER_1 = .5;
+   COUNTER_1 = 5.;
+   TOTAL# = 1.5E10;
+   TOTAL# = 2.0E-5;
+   TOTAL# = 6E+3;
+   TOTAL# = 1.E2;
+   $AMOUNT = 3.14159265358979;
+   J = 1010B;
+   K = 11111111B;
+   Z = 3.0 + 4.0I;
+   Z = 2I;
+
+   /* ---------- String literals ---------- */
+   NAME = 'Hello, World';
+   NAME = '';
+   NAME = 'It''s a quoted apostrophe';
+   NAME = 'A string with /* a fake comment */ inside';
+   MSG  = 'Multiple   spaces   preserved';
+   MSG  = 'Tab and symbols: ; , . : ( ) = + - * / < > & | ^';
+   BITS = '1111'B;
+   BITS = '0'B;
+   HEXVAL = 'CAFE'X;
+   HEXVAL = '00FF'X;
+
+   /* ---------- Operators ---------- */
+   I = J + K;
+   I = J - K;
+   I = J * K;
+   I = J / K;
+   I = J ** 2;
+   NAME = NAME || ' suffix';
+   NAME = 'pre' || NAME || 'post';
+
+   IF I = J THEN I = 1;
+   IF I ^= J THEN I = 2;
+   IF I ¬= J THEN I = 3;
+   IF I < J THEN I = 4;
+   IF I > J THEN I = 5;
+   IF I <= J THEN I = 6;
+   IF I >= J THEN I = 7;
+   IF I ^< J THEN I = 8;
+   IF I ^> J THEN I = 9;
+   IF (I = 1) & (J = 2) THEN K = 1;
+   IF (I = 1) | (J = 2) THEN K = 2;
+   IF ^(I = 1) THEN K = 3;
+   IF ¬(I = 1) THEN K = 4;
+
+   P -> ID = 5;
+   P -> REC.VALUE = 1.0;
+   REC.ID = 10;
+
+   /* ---------- Control flow: labels and keywords ---------- */
+   START_LOOP:
+   DO I = 1 TO 10 BY 2;
+      IF I > 5 THEN
+         LEAVE;
+      ELSE
+         ITERATE;
+   END;
+
+   DO WHILE (J < 100);
+      J = J + 1;
+   END;
+
+   DO UNTIL (K > 50);
+      K = K + 5;
+   END;
+
+   DO I = 1 TO 10;
+      DO J = 1 TO 20;
+         TABLE(I, J) = I * J;
+      END;
+   END;
+
+   SELECT (I);
+      WHEN (1)    PUT SKIP LIST('One');
+      WHEN (2, 3) PUT SKIP LIST('Two or three');
+      OTHERWISE   PUT SKIP LIST('Other');
+   END;
+
+   IF I = 0 THEN
+      GO TO DONE;
+   ELSE
+      GOTO START_LOOP;
+
+   /* ---------- I/O statements ---------- */
+   PUT SKIP LIST('Value is:', I);
+   PUT EDIT('Total = ', TOTAL#) (A, F(10,2));
+   GET LIST(I, J, K);
+   GET EDIT(NAME) (A(30));
+
+   /* ---------- Calls and builtins ---------- */
+   CALL HELPER(I, J);
+   K = MAX(I, J);
+   K = MOD(I, 7);
+   K = LENGTH(NAME);
+   NAME = SUBSTR(NAME, 1, 5);
+   NAME = TRIM(NAME);
+   I = ABS(-5);
+
+   /* ---------- Whitespace / formatting edge cases ---------- */
+   I=1;J=2;K=3;
+   I   =   J   +   K   ;
+   IF I=J THEN K=I;ELSE K=J;
+   NAME='x'||'y'||'z';
+
+   /* Comment immediately followed by code */ I = 99;
+   I = /* inline comment */ 100;
+   /**/
+   /* multi
+      line
+      comment */
+
+   /* ---------- End of main procedure ---------- */
+DONE:
+   PUT SKIP LIST('Finished');
+
+END TESTPROG;
+
+/* ================================================================
+   Secondary procedure
+   ================================================================ */
+HELPER: PROCEDURE(X, Y) RETURNS(FIXED BINARY(31));
+   DECLARE (X, Y) FIXED BINARY(31);
+   DECLARE RESULT FIXED BINARY(31);
+
+   RESULT = X + Y;
+   RETURN(RESULT);
+END HELPER;
+
+/* ================================================================
+   Recursive function
+   ================================================================ */
+FACTORIAL: PROCEDURE(N) RECURSIVE RETURNS(FIXED BINARY(31));
+   DECLARE N FIXED BINARY(31);
+
+   IF N <= 1 THEN
+      RETURN(1);
+   ELSE
+      RETURN(N * FACTORIAL(N - 1));
+END FACTORIAL;
+
+/* ================================================================
+   INTENTIONALLY INVALID TOKENS
+   Uncomment ONE line at a time to test your lexer's error handling.
+   ================================================================ */
+
+/* Unterminated string:
+   MSG = 'this string never ends;                                  */
+
+/* Unterminated comment (remove the closing marker on the line below):
+   /* this comment never closes                                    */
+
+/* Illegal characters:
+   I = J ~ K;
+   I = J ` K;
+   I = J \ K;
+   I = J ! K;                                                       */
+
+/* Malformed numbers:
+   I = 1.2.3;
+   I = 12E;
+   I = 1E+;
+   I = 0xFF;                                                        */
+
+/* Malformed bit / hex strings:
+   BITS = '1012'B;
+   HEXVAL = 'GHIJ'X;                                                */
+
+/* Identifier starting with a digit:
+   DCL 9LIVES FIXED;                                                */

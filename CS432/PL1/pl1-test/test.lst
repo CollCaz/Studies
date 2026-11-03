@@ -1,0 +1,16 @@
+Nov  3, 2026  09:46                         demo: procedure options(main);                                              
+1.4.1                                               Source Listing                                           Page 1     
+    1 demo: procedure options(main);
+    2    declare name character(20) varying;
+    3    put skip(2) list('PLEASE ENTER YOUR FIRST NAME: ');
+    4    get list(name);
+    5    put skip(2) list('HELLO ' || name || ', WELCOME TO PL/I');
+    6 end demo;
+3 (WRN557)Undeclared variable SYSPRINT has been assigned default attributes "EXTERNAL FILE".
+4 (WRN557)Undeclared variable SYSIN has been assigned default attributes "EXTERNAL FILE".
+Nov  3, 2026  09:46                         demo: procedure options(main);                                              
+1.4.1                                            Undeclared Variables                                        Page 2     
+2 undeclared variables.
+SYSIN(4)                SYSPRINT(3) 
+
+End of compilation. 

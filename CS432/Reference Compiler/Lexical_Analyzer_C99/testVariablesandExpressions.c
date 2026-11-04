@@ -2,6 +2,7 @@
 #include <math.h> // Required for the square root function sqrt()
 
 int main(void) {
+    char greeting[] = "Hello";   
     double a, b, c;
     double discriminant, root1, root2, realPart, imagPart;
 

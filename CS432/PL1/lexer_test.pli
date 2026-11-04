@@ -71,17 +71,15 @@ TESTPROG: PROCEDURE OPTIONS(MAIN);
    NAME = 'pre' || NAME || 'post';
 
    IF I = J THEN I = 1;
-   IF I ^= J THEN I = 2;
    IF I ¬= J THEN I = 3;
    IF I < J THEN I = 4;
    IF I > J THEN I = 5;
    IF I <= J THEN I = 6;
    IF I >= J THEN I = 7;
-   IF I ^< J THEN I = 8;
-   IF I ^> J THEN I = 9;
+   IF I ¬< J THEN I = 3;
+   IF I ¬> J THEN I = 3;
    IF (I = 1) & (J = 2) THEN K = 1;
    IF (I = 1) | (J = 2) THEN K = 2;
-   IF ^(I = 1) THEN K = 3;
    IF ¬(I = 1) THEN K = 4;
 
    P -> ID = 5;

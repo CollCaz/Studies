@@ -61,7 +61,7 @@ CHAR_CONST      '\'([^\'\\]|\\.)\''
 <<EOF>>    { print_error(comment_start_line, "Unterminated multi-line comment starting on line", ""); exit(1); }
 }
 
-\"           { 
+\'           { 
     string_buffer_ptr = string_buffer; 
     *string_buffer_ptr++ = '"'; /* Add opening quote */
     *string_buffer_ptr = '\0'; 

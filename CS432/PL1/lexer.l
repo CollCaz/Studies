@@ -109,6 +109,21 @@ CHAR_CONST      '\'([^\'\\]|\\.)\''
                        return 0; }
 }
 
+\'           { 
+    string_buffer_ptr = string_buffer; 
+    *string_buffer_ptr++ = '\''; /* Add opening quote */
+    *string_buffer_ptr = '\0'; 
+    BEGIN(IN_STRING); 
+}
+<IN_STRING>{
+\'           { *string_buffer_ptr++ = '\''; /* Add closing quote */ *string_buffer_ptr = '\0'; print_token(line_count, "STRING_LITERAL", string_buffer); BEGIN(INITIAL); }
+([^\\\'\n]+) { strcpy(string_buffer_ptr, yytext); string_buffer_ptr += yyleng; }
+\'\'         { strcpy(string_buffer_ptr, yytext); string_buffer_ptr += yyleng; }
+(\\[^\'])   { strcpy(string_buffer_ptr, yytext); string_buffer_ptr += yyleng; }
+\n          { print_error(line_count, "Unterminated string literal", ""); line_count++; BEGIN(INITIAL); }
+<<EOF>>     { print_error(line_count, "Unterminated string literal at end of file", ""); exit(1); }
+}
+
 
 ","                  { print_token(line_count, "PUNC_COMMA", yytext); }
 "."                  { print_token(line_count, "PUNC_DOT", yytext); }
